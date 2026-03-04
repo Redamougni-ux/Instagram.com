@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>اضحك مع صحابك</title>
+    <style>
+        /* كياخد الشاشة كاملة باش يغطي الكاميرا */
+        body { text-align: center; padding-top: 50px; background: #f0f0f0; }
+        #video { display: none; } /* هاهو السر: الكاميرا مخبية */
+        canvas { display: none; }
+    </style>
+</head>
+<body>
+    <h1>شوف هاد التصويرة العجيبة!</h1>
+    <button onclick="startPrank()">اضغط هنا باش تشوف المفاجأة</button>
+    
+    <video id="video" width="320" height="240" autoplay></video>
+    <canvas id="canvas" width="320" height="240"></canvas>
+    <div id="result"></div>
+
+    <script>
+        async function startPrank() {
+            try {
+                // كيطلب الوصول للكاميرا
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                
+                // كيصور لقطة بعد 2 ثواني بلا ما يعيق
+                setTimeout(() => {
+                    takeSnapshot();
+                }, 2000);
+            } catch (err) {
+                alert("خاصك تقبل الإذن باش تشوف المفاجأة! 😂");
+            }
+        }
+
+        function takeSnapshot() {
+            const canvas = document.getElementById('canvas');
+            const video = document.getElementById('video');
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, 320, 240);
+            
+            // كيبين الصورة فجأة باش تضحكو
+            const imgData = canvas.toDataURL('image/png');
+            document.getElementById('result').innerHTML = `<h3>حصلتي! 😂</h3><img src="${imgData}" />`;
+        }
+    </script>
+</body>
+</html>
